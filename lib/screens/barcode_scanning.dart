@@ -51,13 +51,17 @@ class _BarcodeScanningState extends State<BarcodeScanning> {
                     try {
                       var file =
                       await ImagePicker.platform.pickImage(source: ImageSource.camera);
-                      final barcodeScanner = BarcodeScanner(formats: formats);
-                      final InputImage inputImage = InputImage.fromFile(File(file!.path));
-                      final List<Barcode> barcodes = await barcodeScanner.processImage(inputImage);
+                      var barCodeScanner = GoogleMlKit.vision.barcodeScanner();
+                      final visionImage = InputImage.fromFilePath(file!.path);
 
-                      setState(()  {
-                        text = barcodes.first.displayValue.toString();
-                      });
+                      var barcodeText= await barCodeScanner.processImage(visionImage);
+
+                      for(Barcode barcode in barcodeText){
+                        setState(() {
+                          text =barcode.displayValue!;
+                        });
+
+                      }
                     } catch (e) {
                       log(e.toString());
                     }

@@ -31,27 +31,62 @@ class _ImageLabelingState extends State<ImageLabeling> {
       appBar: AppBar(
         title: Text(widget.title,),
       ),
-      body: _buildBody(_file),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            var file =
-            await ImagePicker.platform.pickImage(source: ImageSource.gallery);
-            final imageLabeler = ImageLabeler(options: options);
-            final InputImage inputImage = InputImage.fromFile(File(file!.path));
-            final List<ImageLabel> labels = await imageLabeler.processImage(inputImage);
+      body: Container(
+          margin: const EdgeInsets.only(top: 40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _file!=null ?
+              SingleChildScrollView(child: Container(child: _buildBody(_file), height: (MediaQuery.of(context).size.height - 220),)) :
+              Container(
+                  height: 300,
+                  width: 300,
+                  decoration: BoxDecoration(border: Border.all(color: Colors.lightBlueAccent.withOpacity(0.6),), borderRadius: BorderRadius.circular(15)),child: const Center(child: Text("No Data Found"))),
+              Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(onPressed: () async {
+                      try {
+                        var file =
+                        await ImagePicker.platform.pickImage(source: ImageSource.camera);
+                        final imageLabeler = ImageLabeler(options: options);
+                        final InputImage inputImage = InputImage.fromFile(File(file!.path));
+                        final List<ImageLabel> labels = await imageLabeler.processImage(inputImage);
 
-            setState(()  {
-              _file = File(file.path);
-              imageLabels = labels;
+                        setState(()  {
+                          _file = File(file.path);
+                          imageLabels = labels;
 
-            });
-          } catch (e) {
-            log(e.toString());
-          }
-        },
-        child: const Icon(Icons.select_all),
-      ),
+                        });
+                      } catch (e) {
+                        log(e.toString());
+                      }
+                    }, icon: const Icon(Icons.camera_alt, size: 50, color: Colors.blue,)),
+                    IconButton(onPressed: () async{
+                      try {
+                        var file =
+                        await ImagePicker.platform.pickImage(source: ImageSource.gallery);
+                        final imageLabeler = ImageLabeler(options: options);
+                        final InputImage inputImage = InputImage.fromFile(File(file!.path));
+                        final List<ImageLabel> labels = await imageLabeler.processImage(inputImage);
+
+                        setState(()  {
+                          _file = File(file.path);
+                          imageLabels = labels;
+
+                        });
+                      } catch (e) {
+                        log(e.toString());
+                      }
+                    }, icon: const Icon(Icons.add_photo_alternate, size: 50, color: Colors.blue,)),
+                  ],
+                ),
+              )
+            ],
+          ),
+        )
     );
   }
 
@@ -68,6 +103,7 @@ class _ImageLabelingState extends State<ImageLabeling> {
     }
     return Expanded(
       child:  ListView.builder(
+        scrollDirection: Axis.vertical,
           padding: const EdgeInsets.all(1.0),
           itemCount: labels.length,
           itemBuilder: (context, i) {
@@ -81,7 +117,7 @@ class _ImageLabelingState extends State<ImageLabeling> {
       child: file == null
           ?  const Center(child: Text('Sorry nothing selected!!', style: TextStyle(fontSize: 20),))
           :  Container(
-        margin: const EdgeInsets.all(30),
+        margin: const EdgeInsets.all(20),
         height: 200,
         width: 200,
         decoration: BoxDecoration(
