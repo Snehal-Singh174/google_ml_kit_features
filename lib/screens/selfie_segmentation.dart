@@ -103,8 +103,8 @@ class _SelfieSegmentationState extends State<SelfieSegmentation> {
     var decodedImage = await decodeImageFromList(image.readAsBytesSync());
 
     ///need to do calculation for finding image exact height and width
-    final Size imageSize = Size(decodedImage.width.toDouble() / 1.9,
-        decodedImage.height.toDouble() / 1.6);
+    final Size imageSize = Size(decodedImage.width.toDouble() ,
+        decodedImage.height.toDouble() );
 
     ///As our source is gallery then the image
     ///will always be at 90 degree orientation

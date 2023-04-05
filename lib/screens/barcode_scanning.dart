@@ -51,6 +51,9 @@ class _BarcodeScanningState extends State<BarcodeScanning> {
                     try {
                       var file =
                       await ImagePicker.platform.pickImage(source: ImageSource.camera);
+                      setState(() {
+                        text = 'processing...';
+                      });
                       var barCodeScanner = GoogleMlKit.vision.barcodeScanner();
                       final visionImage = InputImage.fromFilePath(file!.path);
 
@@ -58,18 +61,24 @@ class _BarcodeScanningState extends State<BarcodeScanning> {
 
                       for(Barcode barcode in barcodeText){
                         setState(() {
-                          text =barcode.displayValue!;
+                          text = barcode.displayValue!;
                         });
 
                       }
                     } catch (e) {
                       log(e.toString());
+                      setState(() {
+                        text = e.toString();
+                      });
                     }
                   }, icon: const Icon(Icons.camera_alt, size: 50, color: Colors.blue,)),
                   IconButton(onPressed: () async{
                     try {
                       var file =
                           await ImagePicker.platform.pickImage(source: ImageSource.gallery);
+                      setState(() {
+                        text = 'processing...';
+                      });
                       final barcodeScanner = BarcodeScanner(formats: formats);
                       final InputImage inputImage = InputImage.fromFile(File(file!.path));
                       final List<Barcode> barcodes = await barcodeScanner.processImage(inputImage);
@@ -79,6 +88,9 @@ class _BarcodeScanningState extends State<BarcodeScanning> {
                       });
                     } catch (e) {
                       log(e.toString());
+                      setState(() {
+                        text = e.toString();
+                      });
                     }
                   }, icon: const Icon(Icons.add_photo_alternate, size: 50, color: Colors.blue,)),
                 ],
