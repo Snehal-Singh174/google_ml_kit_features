@@ -1,10 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:image_labeling/screens/painter/object_painter.dart';
 import 'package:image_picker/image_picker.dart';
-
 
 class ObjectDetection extends StatefulWidget {
   const ObjectDetection({super.key, required this.title});
@@ -17,74 +18,118 @@ class ObjectDetection extends StatefulWidget {
 
 class _ObjectDetectionState extends State<ObjectDetection> {
   String? text;
-
+  File? _imageFile;
+  List<DetectedObject>? _objects;
+  ui.Image? _image;
   final mode = DetectionMode.single;
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title,),
+        title: Text(
+          widget.title,
+        ),
       ),
       body: Container(
         margin: const EdgeInsets.only(top: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            text!=null ?
-            Container(alignment: Alignment.center,child: SelectableText(text ?? "No Url Found")) :
-            Container(
-                height: 300,
-                width: 300,
-                decoration: BoxDecoration(border: Border.all(color: Colors.lightBlueAccent.withOpacity(0.6),), borderRadius: BorderRadius.circular(15)),child: const Center(child: Text("No Data Found"))),
+            (_imageFile != null && _image != null && _objects != null)
+                ? FittedBox(
+                    child: SizedBox(
+                      width: _image?.width.toDouble() ?? 300,
+                      height: _image?.height.toDouble() ?? 300,
+                      child: CustomPaint(
+                        painter: ObjectPainter(_image!, _objects!),
+                      ),
+                    ),
+                  )
+                : Container(
+                    height: 300,
+                    width: 300,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.lightBlueAccent.withOpacity(0.6),
+                        ),
+                        borderRadius: BorderRadius.circular(15)),
+                    child: const Center(child: Text("No Face Found"))),
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  IconButton(onPressed: () async {
-                    try {
-                      var file =
-                      await ImagePicker.platform.pickImage(source: ImageSource.camera);
-                      final options = ObjectDetectorOptions(mode: mode, classifyObjects: true, multipleObjects: false);
-                      final InputImage inputImage = InputImage.fromFile(File(file!.path));
-                      final objectDetector = ObjectDetector(options: options);
-                      final List<DetectedObject> objects = await objectDetector.processImage(inputImage);
-                      String? label1;
-                      for(DetectedObject detectedObject in objects){
-                       for(Label label in detectedObject.labels){
-                          label1 = label.text;
+                  IconButton(
+                      onPressed: () async {
+                        try {
+                          var file = await ImagePicker.platform
+                              .pickImage(source: ImageSource.camera);
+                          final options = ObjectDetectorOptions(
+                              mode: mode,
+                              classifyObjects: true,
+                              multipleObjects: false);
+                          final InputImage inputImage =
+                              InputImage.fromFile(File(file!.path));
+                          setState(() {
+                            text = 'processing...';
+                          });
+                          final objectDetector =
+                              ObjectDetector(options: options);
+                          final List<DetectedObject> objects =
+                              await objectDetector.processImage(inputImage);
+                          setState(() {
+                            _imageFile = File(file.path);
+                            _objects = objects;
+                            _loadImage(File(file.path));
+                          });
+                        } catch (e) {
+                          log(e.toString());
+                          setState(() {
+                            text = e.toString();
+                          });
                         }
-                      }
-                      setState(()  {
-                       text = label1;
-                      });
-                    } catch (e) {
-                      log(e.toString());
-                    }
-                  }, icon: const Icon(Icons.camera_alt, size: 50, color: Colors.blue,)),
-                  IconButton(onPressed: () async{
-                    try {
-                      var file =
-                      await ImagePicker.platform.pickImage(source: ImageSource.gallery);
-                      final options = ObjectDetectorOptions(mode: mode, classifyObjects: true, multipleObjects: false);
-                      final InputImage inputImage = InputImage.fromFile(File(file!.path));
-                      final objectDetector = ObjectDetector(options: options);
-                      final List<DetectedObject> objects = await objectDetector.processImage(inputImage);
-                      String? label1;
-                      for(DetectedObject detectedObject in objects){
-                        for(Label label in detectedObject.labels){
-                          label1 = label.text;
+                      },
+                      icon: const Icon(
+                        Icons.camera_alt,
+                        size: 50,
+                        color: Colors.blue,
+                      )),
+                  IconButton(
+                      onPressed: () async {
+                        try {
+                          var file = await ImagePicker.platform
+                              .pickImage(source: ImageSource.gallery);
+                          final options = ObjectDetectorOptions(
+                              mode: mode,
+                              classifyObjects: true,
+                              multipleObjects: false);
+                          final InputImage inputImage =
+                              InputImage.fromFile(File(file!.path));
+                          setState(() {
+                            text = 'processing...';
+                          });
+                          final objectDetector =
+                              ObjectDetector(options: options);
+                          final List<DetectedObject> objects =
+                              await objectDetector.processImage(inputImage);
+                          setState(() {
+                            _imageFile = File(file.path);
+                            _objects = objects;
+                            _loadImage(File(file.path));
+                          });
+                        } catch (e) {
+                          log(e.toString());
+                          setState(() {
+                            text = e.toString();
+                          });
                         }
-                      }
-                      setState(()  {
-                        text = label1;
-                      });
-                    } catch (e) {
-                      log(e.toString());
-                    }
-                  }, icon: const Icon(Icons.add_photo_alternate, size: 50, color: Colors.blue,)),
+                      },
+                      icon: const Icon(
+                        Icons.add_photo_alternate,
+                        size: 50,
+                        color: Colors.blue,
+                      )),
                 ],
               ),
             )
@@ -92,5 +137,12 @@ class _ObjectDetectionState extends State<ObjectDetection> {
         ),
       ),
     );
+  }
+
+  _loadImage(File file) async {
+    final data = await file.readAsBytes();
+    await decodeImageFromList(data).then((value) => setState(() {
+          _image = value;
+        }));
   }
 }
