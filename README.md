@@ -17,7 +17,7 @@
 
 
 ## :hourglass: Result
-<img src="https://github.com/Snehal-Singh174/google_ml_kit_features/blob/main/output/supabase_insert.mp4" width="800"/>
+<img src="https://github.com/Snehal-Singh174/google_ml_kit_features/blob/main/output/output.gif" width="800"/>
 
 ## :warning: TechStack/framework used
 
