@@ -20,9 +20,6 @@ class _BarcodeScanningState extends State<BarcodeScanning> {
 
   final List<BarcodeFormat> formats = [BarcodeFormat.all,];
 
-  final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-
-
   final id = DateTime.now().microsecondsSinceEpoch.toString();
 
   @override
