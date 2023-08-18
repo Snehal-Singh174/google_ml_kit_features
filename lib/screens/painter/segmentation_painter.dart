@@ -8,10 +8,10 @@ class SegmentationPainter extends CustomPainter {
   final InputImageRotation rotation;
 
   SegmentationPainter(
-      this.mask,
-      this.absoluteImageSize,
-      this.rotation,
-      );
+    this.mask,
+    this.absoluteImageSize,
+    this.rotation,
+  );
 
   @override
   void paint(Canvas canvas, Size size) {

@@ -21,7 +21,12 @@ class _ObjectDetectionState extends State<ObjectDetection> {
   File? _imageFile;
   List<DetectedObject>? _objects;
   ui.Image? _image;
-  final mode = DetectionMode.single;
+
+  final objectDetector = ObjectDetector(
+      options: ObjectDetectorOptions(
+          mode: DetectionMode.single,
+          classifyObjects: true,
+          multipleObjects: false));
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +59,7 @@ class _ObjectDetectionState extends State<ObjectDetection> {
                           color: Colors.lightBlueAccent.withOpacity(0.6),
                         ),
                         borderRadius: BorderRadius.circular(15)),
-                    child: const Center(child: Text("No Face Found"))),
+                    child: const Center(child: Text("No Object Found"))),
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: Row(
@@ -65,17 +70,11 @@ class _ObjectDetectionState extends State<ObjectDetection> {
                         try {
                           var file = await ImagePicker.platform
                               .pickImage(source: ImageSource.camera);
-                          final options = ObjectDetectorOptions(
-                              mode: mode,
-                              classifyObjects: true,
-                              multipleObjects: false);
                           final InputImage inputImage =
                               InputImage.fromFile(File(file!.path));
                           setState(() {
                             text = 'processing...';
                           });
-                          final objectDetector =
-                              ObjectDetector(options: options);
                           final List<DetectedObject> objects =
                               await objectDetector.processImage(inputImage);
                           setState(() {
@@ -100,17 +99,12 @@ class _ObjectDetectionState extends State<ObjectDetection> {
                         try {
                           var file = await ImagePicker.platform
                               .pickImage(source: ImageSource.gallery);
-                          final options = ObjectDetectorOptions(
-                              mode: mode,
-                              classifyObjects: true,
-                              multipleObjects: false);
                           final InputImage inputImage =
                               InputImage.fromFile(File(file!.path));
                           setState(() {
                             text = 'processing...';
                           });
-                          final objectDetector =
-                              ObjectDetector(options: options);
+
                           final List<DetectedObject> objects =
                               await objectDetector.processImage(inputImage);
                           setState(() {

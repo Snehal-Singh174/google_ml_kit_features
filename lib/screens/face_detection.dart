@@ -21,8 +21,7 @@ class _FaceDetectionState extends State<FaceDetection> {
   List<Face>? _faces;
   ui.Image? _image;
 
-  /// The options for the image labeler.
-  final options = FaceDetectorOptions();
+  final faceDetector = GoogleMlKit.vision.faceDetector(FaceDetectorOptions());
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +65,6 @@ class _FaceDetectionState extends State<FaceDetection> {
                         try {
                           var file = await ImagePicker.platform
                               .pickImage(source: ImageSource.camera);
-                          final faceDetector = FaceDetector(options: options);
                           final InputImage inputImage =
                               InputImage.fromFile(File(file!.path));
                           final List<Face> faces =
@@ -90,7 +88,6 @@ class _FaceDetectionState extends State<FaceDetection> {
                       try {
                         var file = await ImagePicker.platform
                             .pickImage(source: ImageSource.gallery);
-                        final faceDetector = FaceDetector(options: options);
                         final InputImage inputImage =
                             InputImage.fromFile(File(file!.path));
                         final List<Face> faces =

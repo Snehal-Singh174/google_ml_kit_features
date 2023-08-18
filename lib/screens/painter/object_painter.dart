@@ -28,6 +28,6 @@ class ObjectPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(ObjectPainter old) {
-    return image != old.image  || objects != old.objects;
+    return image != old.image || objects != old.objects;
   }
 }

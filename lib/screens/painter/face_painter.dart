@@ -29,6 +29,6 @@ class FacePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(FacePainter oldDelegate) {
-    return image != oldDelegate.image  || faces != oldDelegate.faces;
+    return image != oldDelegate.image || faces != oldDelegate.faces;
   }
 }

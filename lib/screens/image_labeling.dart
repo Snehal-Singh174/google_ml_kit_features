@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 
-
 class ImageLabeling extends StatefulWidget {
   const ImageLabeling({super.key, required this.title});
 
@@ -20,74 +19,96 @@ class _ImageLabelingState extends State<ImageLabeling> {
 
   var imageLabels = <ImageLabel>[];
 
-  /// The options for the image labeler.
-  final ImageLabelerOptions options = ImageLabelerOptions(confidenceThreshold: 0.5);
+  final imageLabeler =
+      ImageLabeler(options: ImageLabelerOptions(confidenceThreshold: 0.5));
 
   final id = DateTime.now().microsecondsSinceEpoch.toString();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title,),
-      ),
-      body: Container(
+        appBar: AppBar(
+          title: Text(
+            widget.title,
+          ),
+        ),
+        body: Container(
           margin: const EdgeInsets.only(top: 40),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _file!=null ?
-              SingleChildScrollView(child: Container(child: _buildBody(_file), height: (MediaQuery.of(context).size.height - 220),)) :
-              Container(
-                  height: 300,
-                  width: 300,
-                  decoration: BoxDecoration(border: Border.all(color: Colors.lightBlueAccent.withOpacity(0.6),), borderRadius: BorderRadius.circular(15)),child: const Center(child: Text("No Data Found"))),
+              _file != null
+                  ? SingleChildScrollView(
+                      child: Container(
+                      child: _buildBody(_file),
+                      height: (MediaQuery.of(context).size.height - 220),
+                    ))
+                  : Container(
+                      height: 300,
+                      width: 300,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.lightBlueAccent.withOpacity(0.6),
+                          ),
+                          borderRadius: BorderRadius.circular(15)),
+                      child: const Center(child: Text("No Data Found"))),
               Padding(
                 padding: const EdgeInsets.all(18.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    IconButton(onPressed: () async {
-                      try {
-                        var file =
-                        await ImagePicker.platform.pickImage(source: ImageSource.camera);
-                        final imageLabeler = ImageLabeler(options: options);
-                        final InputImage inputImage = InputImage.fromFile(File(file!.path));
-                        final List<ImageLabel> labels = await imageLabeler.processImage(inputImage);
+                    IconButton(
+                        onPressed: () async {
+                          try {
+                            var file = await ImagePicker.platform
+                                .pickImage(source: ImageSource.camera);
+                            final InputImage inputImage =
+                                InputImage.fromFile(File(file!.path));
+                            final List<ImageLabel> labels =
+                                await imageLabeler.processImage(inputImage);
 
-                        setState(()  {
-                          _file = File(file.path);
-                          imageLabels = labels;
+                            setState(() {
+                              _file = File(file.path);
+                              imageLabels = labels;
+                            });
+                          } catch (e) {
+                            log(e.toString());
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.camera_alt,
+                          size: 50,
+                          color: Colors.blue,
+                        )),
+                    IconButton(
+                        onPressed: () async {
+                          try {
+                            var file = await ImagePicker.platform
+                                .pickImage(source: ImageSource.gallery);
+                            final InputImage inputImage =
+                                InputImage.fromFile(File(file!.path));
+                            final List<ImageLabel> labels =
+                                await imageLabeler.processImage(inputImage);
 
-                        });
-                      } catch (e) {
-                        log(e.toString());
-                      }
-                    }, icon: const Icon(Icons.camera_alt, size: 50, color: Colors.blue,)),
-                    IconButton(onPressed: () async{
-                      try {
-                        var file =
-                        await ImagePicker.platform.pickImage(source: ImageSource.gallery);
-                        final imageLabeler = ImageLabeler(options: options);
-                        final InputImage inputImage = InputImage.fromFile(File(file!.path));
-                        final List<ImageLabel> labels = await imageLabeler.processImage(inputImage);
-
-                        setState(()  {
-                          _file = File(file.path);
-                          imageLabels = labels;
-
-                        });
-                      } catch (e) {
-                        log(e.toString());
-                      }
-                    }, icon: const Icon(Icons.add_photo_alternate, size: 50, color: Colors.blue,)),
+                            setState(() {
+                              _file = File(file.path);
+                              imageLabels = labels;
+                            });
+                          } catch (e) {
+                            log(e.toString());
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.add_photo_alternate,
+                          size: 50,
+                          color: Colors.blue,
+                        )),
                   ],
                 ),
               )
             ],
           ),
-        )
-    );
+        ));
   }
 
   Widget _buildBody(File? file) {
@@ -98,34 +119,39 @@ class _ImageLabelingState extends State<ImageLabeling> {
   }
 
   Widget _buildList(List<ImageLabel> labels) {
-    if (labels.isEmpty ) {
+    if (labels.isEmpty) {
       return const SizedBox();
     }
     return Expanded(
-      child:  ListView.builder(
-        scrollDirection: Axis.vertical,
+      child: ListView.builder(
+          scrollDirection: Axis.vertical,
           padding: const EdgeInsets.all(1.0),
           itemCount: labels.length,
           itemBuilder: (context, i) {
-            return _buildRow(labels[i].label, labels[i].confidence.toString(), labels[i].index.toString());
+            return _buildRow(labels[i].label, labels[i].confidence.toString(),
+                labels[i].index.toString());
           }),
     );
   }
 
   Widget displaySelectedFile(File? file) {
-    return  SizedBox(
+    return SizedBox(
       child: file == null
-          ?  const Center(child: Text('Sorry nothing selected!!', style: TextStyle(fontSize: 20),))
-          :  Container(
-        margin: const EdgeInsets.all(20),
-        height: 200,
-        width: 200,
-        decoration: BoxDecoration(
-          image: DecorationImage(image: FileImage(file, scale: 1), fit: BoxFit.cover),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(width: 2.5, color: Colors.blue)
-        ),
-      ),
+          ? const Center(
+              child: Text(
+              'Sorry nothing selected!!',
+              style: TextStyle(fontSize: 20),
+            ))
+          : Container(
+              margin: const EdgeInsets.all(20),
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: FileImage(file, scale: 1), fit: BoxFit.cover),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(width: 2.5, color: Colors.blue)),
+            ),
     );
   }
 
@@ -139,5 +165,4 @@ class _ImageLabelingState extends State<ImageLabeling> {
       dense: true,
     );
   }
-
 }
