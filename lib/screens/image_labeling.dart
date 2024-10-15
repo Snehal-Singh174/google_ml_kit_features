@@ -22,6 +22,8 @@ class _ImageLabelingState extends State<ImageLabeling> {
   final imageLabeler =
       ImageLabeler(options: ImageLabelerOptions(confidenceThreshold: 0.5));
 
+  final ImagePicker picker = ImagePicker();
+
   final id = DateTime.now().microsecondsSinceEpoch.toString();
 
   @override
@@ -39,9 +41,9 @@ class _ImageLabelingState extends State<ImageLabeling> {
             children: [
               _file != null
                   ? SingleChildScrollView(
-                      child: Container(
+                      child: SizedBox(
+                      height: (MediaQuery.of(context).size.height - 222),
                       child: _buildBody(_file),
-                      height: (MediaQuery.of(context).size.height - 220),
                     ))
                   : Container(
                       height: 300,
@@ -60,8 +62,8 @@ class _ImageLabelingState extends State<ImageLabeling> {
                     IconButton(
                         onPressed: () async {
                           try {
-                            var file = await ImagePicker.platform
-                                .pickImage(source: ImageSource.camera);
+                            var file = await picker.pickImage(
+                                source: ImageSource.camera);
                             final InputImage inputImage =
                                 InputImage.fromFile(File(file!.path));
                             final List<ImageLabel> labels =
@@ -83,8 +85,8 @@ class _ImageLabelingState extends State<ImageLabeling> {
                     IconButton(
                         onPressed: () async {
                           try {
-                            var file = await ImagePicker.platform
-                                .pickImage(source: ImageSource.gallery);
+                            var file = await picker.pickImage(
+                                source: ImageSource.gallery);
                             final InputImage inputImage =
                                 InputImage.fromFile(File(file!.path));
                             final List<ImageLabel> labels =
@@ -112,9 +114,11 @@ class _ImageLabelingState extends State<ImageLabeling> {
   }
 
   Widget _buildBody(File? file) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[displaySelectedFile(file), _buildList(imageLabels)],
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[displaySelectedFile(file), _buildList(imageLabels)],
+      ),
     );
   }
 
